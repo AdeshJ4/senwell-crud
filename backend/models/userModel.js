@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     trim: true,
     required: true,
-    enum: ['male', 'female', 'other'] // Assuming these are the options for gender
+    enum: ["male", "female", "other"], // Assuming these are the options for gender
   },
   mobileNo: {
     type: Number,
@@ -53,13 +53,16 @@ const userSchema = new mongoose.Schema({
   },
   profilePicture: {
     type: String, // Store the file name of the image
-    default: "profile_pic.jpg" // Provide a default image file name if no profile picture is provided
-  }
+    default: "profile_pic.jpg", // Provide a default image file name if no profile picture is provided
+  },
+  isAdmin: {
+    type: Boolean,
+  },
 });
 
 userSchema.methods.generateToken = function () {
   const token = jwt.sign(
-    { _id: this._id, userName: this.name },
+    { _id: this._id, userName: this.name, isAdmin: this.isAdmin },
     config.get("jwtPrivateKey"),
     { expiresIn: "2 days" }
   );
@@ -67,13 +70,14 @@ userSchema.methods.generateToken = function () {
   return token;
 };
 
+// register user
 function validateUserRegister(user) {
   const joiSchema = Joi.object({
     firstName: Joi.string().required().min(5).max(50).trim(),
     lastName: Joi.string().required().min(5).max(50).trim(),
     mobileNo: Joi.number().required(),
     dateOfBirth: Joi.date().required(),
-    gender: Joi.string().valid('male', 'female', 'other').required(),
+    gender: Joi.string().valid("male", "female", "other").required(),
     email: Joi.string().min(11).max(50).required().email(),
     country: Joi.string().required(),
     password: passwordComplexity().required(),
@@ -82,6 +86,7 @@ function validateUserRegister(user) {
   return joiSchema.validate(user);
 }
 
+// update User
 function validateUser(user) {
   const joiSchema = Joi.object({
     firstName: Joi.string().required().min(5).max(50).trim(),
@@ -89,7 +94,7 @@ function validateUser(user) {
     mobileNo: Joi.number().required(),
     country: Joi.string().required(),
     dateOfBirth: Joi.date().required(),
-    gender: Joi.string().valid('male', 'female', 'other').required(),
+    gender: Joi.string().valid("male", "female", "other").required(),
   });
 
   return joiSchema.validate(user);
@@ -106,4 +111,9 @@ function validateUserLogin(user) {
 
 const User = mongoose.model("User", userSchema);
 
-module.exports = { User, validateUserRegister, validateUserLogin, validateUser };
+module.exports = {
+  User,
+  validateUserRegister,
+  validateUserLogin,
+  validateUser,
+};
