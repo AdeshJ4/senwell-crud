@@ -11,6 +11,8 @@ const {
 } = require("../models/userModel");
 const emailService = require("../utils/emailService");
 
+const pageSize = 10;
+
 const registerUser = async (req, res) => {
   try {
     console.log("I am Here1");
@@ -114,6 +116,25 @@ const getUsers = async (req, res) => {
   }
 };
 
+const getUserByName = async (req, res) => {
+  try {
+    const pageNumber = parseInt(req.query.pageNumber) || 1;
+
+    const userName = req.params.userName;
+    const regex = new RegExp(userName, "i"); // Case-insensitive regex for partial match
+
+    // Search for movies with similar names
+    const count = await User.countDocuments({ name: regex });
+    const users = await User.find({ name: regex })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .select("-password");
+    return res.status(200).json({ count, users });
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+};
+
 const updateUser = async (req, res) => {
   console.log("file:", req.file);
 
@@ -188,6 +209,7 @@ module.exports = {
   loginUser,
   getUser,
   getUsers,
+  getUserByName,
   updateUser,
   deleteUser,
 };

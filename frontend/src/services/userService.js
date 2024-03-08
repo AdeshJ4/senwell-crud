@@ -7,6 +7,16 @@ export async function getUser(userId) {
   return await http.get(`${apiEndpoint}/${userId}`);
 }
 
+export async function getUsers(currentPage) {
+  return await http.get(`${apiEndpoint}?pageNumber=${currentPage}`);
+}
+
+export const getUsersBySearchQuery = async (query, pageNumber) => {
+  return await http.get(
+    `${apiEndpoint}/search/${query}?pageNumber=${pageNumber}`
+  );
+};
+
 export async function registerUser(user) {
   console.log(user);
   if (user._id) {

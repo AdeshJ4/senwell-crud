@@ -5,6 +5,7 @@ const {
   loginUser,
   getUser,
   getUsers,
+  getUserByName,
   updateUser,
   deleteUser,
 } = require("../controllers/usersController");
@@ -22,6 +23,9 @@ router.get("/:id", getUser);
 
 // get all users/employees
 router.get("/", getUsers);
+
+// get user by username
+router.get("/search/:userName", getUserByName);
 
 // Update User
 const storage = multer.diskStorage({
